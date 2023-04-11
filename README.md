@@ -20,3 +20,9 @@ git commit -m "메시지"
 git push origin main
 
 하시면 깃허브에 업로드 됩니다.
+
+귀찮으시면 autoPush.bat 파일 누르면 자동으로 실행됩니다.
+
+autoPush.bat 파일을 메모장으로 열어서 "메시지"부분을 바꾸면 좋습니다.
+
+ex) "이정빈 2023-04-11 업로드"
