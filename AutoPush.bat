@@ -1,5 +1,5 @@
 git add *
-git commit -m "파일 추가"
+git commit -m "Add files"
 git push origin main
 
 pause
