@@ -1,0 +1,1 @@
+cmd_/home/user/IOT/Project/LED_Driver/LED_Driver.mod := printf '%s\n'   LED_Driver.o | awk '!x[$$0]++ { print("/home/user/IOT/Project/LED_Driver/"$$0) }' > /home/user/IOT/Project/LED_Driver/LED_Driver.mod
