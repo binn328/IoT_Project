@@ -10,6 +10,7 @@ MODULE_LICENSE("GPL");
 MODULE_AUTHOR("binn328");
 MODULE_DESCRIPTION("LED를 끄고 키는 GPIO 장치드라이버");
 
+<<<<<<< HEAD
 /* led 핀 번호 define */
 #define RED 14     //빨간 LED 
 #define YELLOW 15   //노란 LED
@@ -227,4 +228,6 @@ static void __exit led_exit(void){
 
 module_init(led_init);
 module_exit(led_exit);
+=======
+>>>>>>> 128fd28fae70afcdb06250493ddb6cbceeb16a38
 

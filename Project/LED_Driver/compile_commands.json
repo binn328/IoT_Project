@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [
   {
     "arguments": [
@@ -90,3 +91,6 @@
     "output": "/home/user/IOT/Project/LED_Driver/LED_Driver.o"
   }
 ]
+=======
+[]
+>>>>>>> 128fd28fae70afcdb06250493ddb6cbceeb16a38
