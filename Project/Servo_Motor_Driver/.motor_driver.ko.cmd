@@ -1,0 +1,1 @@
+cmd_/home/user/IOT/Project/Servo_Motor_Driver/motor_driver.ko := ld -r -EL  -maarch64elf -z noexecstack --build-id=sha1  -T scripts/module.lds -o /home/user/IOT/Project/Servo_Motor_Driver/motor_driver.ko /home/user/IOT/Project/Servo_Motor_Driver/motor_driver.o /home/user/IOT/Project/Servo_Motor_Driver/motor_driver.mod.o;  true

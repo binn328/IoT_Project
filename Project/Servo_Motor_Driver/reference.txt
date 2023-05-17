@@ -1,0 +1,10 @@
+https://linuxtv.org/downloads/v4l-dvb-internals/device-drivers/API-pwm-config.html
+
+https://android.googlesource.com/kernel/msm/+/android-7.1.0_r0.2/include/linux/pwm.h?autodive=0%2F%2F%2F%2F%2F%2F%2F
+
+https://minimonk.net/10922
+
+https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=specialist0&logNo=220841646511
+
+https://learn.adafruit.com/adafruits-raspberry-pi-lesson-8-using-a-servo-motor/software
+
