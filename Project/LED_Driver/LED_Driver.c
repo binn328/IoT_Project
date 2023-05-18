@@ -47,6 +47,8 @@ static ssize_t led_write(struct file *File, const char *buffer, size_t count, lo
         case '1':
             gpio_set_value(RED, 1);
             break;
+        case ' ':
+            break;
         default:
             printk("잘못된 값입니다!");
     }
@@ -57,6 +59,8 @@ static ssize_t led_write(struct file *File, const char *buffer, size_t count, lo
             break;
         case '1':
             gpio_set_value(YELLOW, 1);
+            break;
+        case ' ':
             break;
         default:
             printk("잘못된 값입니다!");
@@ -69,6 +73,8 @@ static ssize_t led_write(struct file *File, const char *buffer, size_t count, lo
         case '1':
             gpio_set_value(GREEN, 1);
             break;
+        case ' ':
+            break;
         default:
             printk("잘못된 값입니다!");
     }
@@ -79,6 +85,8 @@ static ssize_t led_write(struct file *File, const char *buffer, size_t count, lo
             break;
         case '1':
             gpio_set_value(BLUE, 1);
+            break;
+        case ' ':
             break;
         default:
             printk("잘못된 값입니다!");
