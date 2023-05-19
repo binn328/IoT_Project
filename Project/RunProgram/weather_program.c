@@ -14,7 +14,7 @@
 #define WEATHER_TEST_03_FILE ""
 
 /* led를 위한 on off 변수 */
-char stay = ' ';
+char stay = ' ';        //이전 상태를 유지
 char on = '1';
 char off = '0';
 
