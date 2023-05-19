@@ -22,6 +22,8 @@ char off = '0';
 int open_led();
 /* servo_motor 파일 여는 함수 */
 int open_servo_motor();
+/* 날씨 정보 파일 여는 함수 */
+int open_weather_file();
 
 /* 각 led 설정하는 함수 */
 void led_setting(int fd_led, char red, char yellow, char green, char blue);
@@ -34,10 +36,12 @@ void motor_write(int fd_servo, char data);
 /* 최초 구동 시 장치의 작동을 테스트하는 함수 */
 void device_init(int fd_led, int fd_servo);
 
+
 int main(int argc, char **argv){
     /* 장치 파일 디스크럽터 */
     int fd_led;
     int fd_servo_motor;
+    int fd_weather_info;
 
     /* led 파일 열기 */
     fd_led = open_led();
@@ -46,8 +50,17 @@ int main(int argc, char **argv){
     fd_servo_motor = open_servo_motor();
 
     /* 날씨 정보 열어서 정보 가져오기 */
+    int weather = 0;          //날씨 : (0, 맑음) (1, 흐림) (2, 눈/비)
+    int is_rain = 0;            //비소식 : (0, 없음) (1, 있음)
+    int dust = 0;               //미세먼지 농도 : 받아서 if문으로 좋음 보통 나쁨 구분할 것
+
+    /* 날씨 정보 파일 열기 */
+    //fd_weather_info = open_weather_file();
 
     /* 장치 정상작동 확인하기 */   
+    device_init(fd_led, fd_servo_motor);
+
+
 
 
     /* 종료하기 */
@@ -55,6 +68,7 @@ int main(int argc, char **argv){
     close(fd_servo_motor);
     return 0;
 }
+
 
 /* led 파일 여는 함수 */
 int open_led() {
@@ -69,9 +83,20 @@ int open_led() {
 /* servo_motor 파일 여는 함수 */
 int open_servo_motor() {
         int fd;
-        fd= open(SERVO_MOTOR_NAME, O_RDWR);
+        fd = open(SERVO_MOTOR_NAME, O_RDWR);
         if (fd< 0) {
                 fprintf(stderr, "Can't open %s\n", SERVO_MOTOR_NAME);
+                return -1;
+        }
+        return fd;
+}
+
+/* 날씨 정보 파일 여는 함수 */
+int open_weather_file() {
+        int fd;
+        fd = open(WEATHER_INFO_FILE, O_RDWR);
+        if (fd < 0) {
+                fprintf(stderr, "Can't open %s\n", WEATHER_INFO_FILE);
                 return -1;
         }
         return fd;
