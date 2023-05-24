@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <fcntl.h>
 #include <linux/kdev_t.h>
 
@@ -10,8 +11,8 @@
 #define SERVO_MOTOR_NAME "/dev/motor_driver"
 #define WEATHER_INFO_FILE "./java_api.txt"
 #define WEATHER_TEST_01_FILE "./test01.txt"
-#define WEATHER_TEST_02_FILE ""
-#define WEATHER_TEST_03_FILE ""
+#define WEATHER_TEST_02_FILE "./test02.txt"
+#define WEATHER_TEST_03_FILE "./test03.txt"
 
 /* led를 위한 on off 변수 */
 char stay = ' ';        //이전 상태를 유지
@@ -37,10 +38,13 @@ void motor_write(int fd_servo, char data);
 void device_init(int fd_led, int fd_servo);
 
 /* 날씨 정보 얻어오기 */
-int get_weather(int* weather, int* is_rain, int* dust);
+int get_weather(int input, int* weather, int* is_rain, int* dust);
 
 /* 읽어온 정보를 토대로 led와 모터 설정 */
 void set_weather(int fd_led, int fd_servo, int weather, int is_rain, int dust);
+
+/* jar 파일을 실행해 날씨 정보를 얻어옴 */
+int exec_java();
 
 int main(int argc, char **argv){
     /* 장치 파일 디스크럽터 */
@@ -60,17 +64,75 @@ int main(int argc, char **argv){
     int dust = 0;               //미세먼지 농도 : (0 좋음 : 0~15 / 1 보통 : 16~35 / 2 나쁨 : 36~)
 
     /* 장치 정상작동 확인하기 */   
-    device_init(fd_led, fd_servo_motor);
+    //device_init(fd_led, fd_servo_motor);
+    
+    /* 동작 선택하기 */
+    int input = 0;
+    int result;
+    printf("1. run, 2. test01, 3. test02, 4. test03 >> ");
+    scanf("%d", &input);
+    
+    switch(input){
+        /* run */
+        case 1:
+            while (1) {
+                /* 파일 생성 */
+                exec_java();
+                /* 날씨 정보 파일 열기 */
+                result = get_weather(1, &weather, &is_rain, &dust);
+                if (result) {
+                    printf("날씨 정보 열기 실패\n");
+                    return -1;
+                }
 
-    /* 날씨 정보 파일 열기 */
-    int result = get_weather(&weather, &is_rain, &dust);
-    if (result) {
-            printf("날씨 정보 열기 실패\n");
+                /* 얻어온대로 장치 설정하기 */
+                set_weather(fd_led, fd_servo_motor, weather, is_rain, dust);
+
+                sleep(3600);
+            }
+            break;
+        /* test01 */
+        case 2:
+            /* 날씨 테스트01 열기 */
+            result = get_weather(2, &weather, &is_rain, &dust);
+            if (result) {
+                printf("날씨 정보 열기 실패\n");
+                return -1;
+            }
+
+            /* 얻어온대로 장치 설정하기 */
+            set_weather(fd_led, fd_servo_motor, weather, is_rain, dust);
+            break;
+        /* test 02 */
+        case 3:
+            /* 날씨 테스트02 열기 */
+            result = get_weather(3, &weather, &is_rain, &dust);
+            if (result) {
+                printf("날씨 정보 열기 실패\n");
+                return -1;
+            }
+
+            /* 얻어온대로 장치 설정하기 */
+            set_weather(fd_led, fd_servo_motor, weather, is_rain, dust);
+            break;
+        /* test 03 */
+        case 4:
+            /* 날씨 테스트03 열기 */
+            result = get_weather(2, &weather, &is_rain, &dust);
+            if (result) {
+                printf("날씨 정보 열기 실패\n");
+                return -1;
+            }
+
+            /* 얻어온대로 장치 설정하기 */
+            set_weather(fd_led, fd_servo_motor, weather, is_rain, dust);
+            break;
+        /* 이상한 값 */
+        default:
             return -1;
     }
-
-    /* 얻어온대로 장치 설정하기 */
-    set_weather(fd_led, fd_servo_motor, weather, is_rain, dust);
+    
+    
 
     /* 종료하기 */
     close(fd_led);
@@ -129,52 +191,73 @@ void motor_write(int fd_servo, char data){
 /* 최초구동시 장치 작동여부 확인하는 함수 */
 void device_init(int fd_led, int fd_servo) {
         /* led 작동을 테스트 */
+        printf("led_test\n");
         /* led 모두 끄기*/
         led_setting(fd_led, off, off, off, off);
-        sleep(0.1);
+        sleep(1);
         /* led 하나씩 키고 끄기 */
         led_setting(fd_led, on, off, off, off);
-        sleep(0.1);
+        sleep(1);
         led_setting(fd_led, off, on, off, off);
-        sleep(0.1);
+        sleep(1);
         led_setting(fd_led, off, off, on, off);
-        sleep(0.1);
+        sleep(1);
         led_setting(fd_led, off, off, off, on);
-        sleep(0.2);
+        sleep(1);
         led_setting(fd_led, off, off, on, off);
-        sleep(0.1);
+        sleep(1);
         led_setting(fd_led, off, on, off, off);
-        sleep(0.1);
+        sleep(1);
         led_setting(fd_led, on, off, off, off);
-        sleep(0.1);
+        sleep(1);
         led_setting(fd_led, off, off, off, off);
-        sleep(0.1);
+        sleep(1);
         /* led 모두 껐다켰다 2회 반복 */
         for (int i = 0; i < 2; i++) {
                 led_setting(fd_led, on, on, on, on);
-                sleep(0.3);
+                sleep(1);
                 led_setting(fd_led, off, off, off, off);
-                sleep(0.3);
+                sleep(1);
         }
         /* led 작동 확인 완료 */
 
         /* servo_motor 작동을 테스트 */
+        printf("motor test\n");
         /* 90' 에서 -90도로, -90도에서 90도로 돌리기 */
+        printf("test01\n");
         char angle[] = { '0', '1', '2', '3', '4', '5', '6' };
         for (int i = 0; i < 7; i++) {
                 motor_write(fd_servo, angle[i]);
-                sleep(0.1);
+                sleep(1);
         }
-        for (int i = 6; i > -1; i++) {
+        printf("test02\n");
+        for (int i = 6; i > -1; i--) {
                 motor_write(fd_servo, angle[i]);
-                sleep(0.1);
+                sleep(1);
         }
         /* 작동 확인 완료 */
+        printf("ok\n");
 }
 
 /* 날씨 받아오는 프로그램*/
-int get_weather(int* weather, int* is_rain, int* dust) {
-        int fd = open(WEATHER_TEST_01_FILE, O_RDWR);
+int get_weather(int input, int* weather, int* is_rain, int* dust) {
+    int fd;
+    switch(input){
+        case 1:
+            fd = open(WEATHER_INFO_FILE, O_RDWR);
+            break;
+        case 2:
+            fd = open(WEATHER_TEST_01_FILE, O_RDWR);
+            break;
+        case 3:
+            fd = open(WEATHER_TEST_02_FILE, O_RDWR);
+            break;
+        case 4:
+            fd = open(WEATHER_TEST_03_FILE, O_RDWR);
+            break;
+        default:
+            return -1;
+    }
 
         if (fd < 0) {
                 fprintf(stderr, "날씨 파일을 여는데 실패했습니다!\n");
@@ -182,15 +265,19 @@ int get_weather(int* weather, int* is_rain, int* dust) {
         }
         
         char buffer[5] = { '\0', };
-        ssize_t result = read(fd, buffer, sizeof(char) * 5);
-        if (result) {
+        int result = read(fd, buffer, 5);
+        if (!result) {
                 fprintf(stderr, "파일 읽기 실패\n");
                 return -1;
         }
+        for(int i = 0; i < 5; i++){
+            printf("%c", buffer[i]);
+        }
+        printf("\n");
         close(fd);
-        *weather = (int(buffer[0] - '0');
-        *is_rain = (int(buffer[2] - '0');
-        *dust = (int(buffer[4] - '0');
+        *weather = (int)(buffer[0] - '0');
+        *is_rain = (int)(buffer[2] - '0');
+        *dust = (int)(buffer[4] - '0');
 
         return 0;
 }
@@ -201,10 +288,10 @@ void set_weather(int fd_led, int fd_servo, int weather, int is_rain, int dust) {
 
         switch (is_rain) {
         case 0:
-                led_info[3] = on;
+                led_info[3] = off;
                 break;
         case 1:
-                led_info[3] = off;
+                led_info[3] = on;
                 break;
         default:
                 led_info[3] = off;
@@ -238,19 +325,35 @@ void set_weather(int fd_led, int fd_servo, int weather, int is_rain, int dust) {
         char motor = '0';
 
         switch (weather) {
-        case 0:
-                motor = 5;
+        case 0: //맑음
+                motor = '3';
                 break;
-        case 1:
-                motor = 3;
+        case 1: //흐림
+                motor = '5';
                 break;
-        case 2:
-                motor = 1;
+        case 2: //비옴
+                motor = '1';
                 break;
         default:
-                motor = 0;
+                motor = '0';
                 break;
         }
 
         motor_write(fd_servo, motor);
+}
+
+/* jar 파일을 실행해 날씨 정보를 얻어옴 */
+int exec_java() {
+        pid_t pid;
+        pid = fork();
+        int status, child;
+        
+        if (pid == 0) {
+                execl("/usr/bin/java", "java", "-jar", "./weather_jar.jar", NULL);
+        }
+        else {
+                child = waitpid(pid, &status, 0);
+        }
+
+        return 0;
 }
