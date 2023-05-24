@@ -8,8 +8,8 @@
 
 #define LED_FILE_NAME "/dev/led_driver"
 #define SERVO_MOTOR_NAME "/dev/motor_driver"
-#define WEATHER_INFO_FILE ""
-#define WEATHER_TEST_01_FILE ""
+#define WEATHER_INFO_FILE "./java_api.txt"
+#define WEATHER_TEST_01_FILE "./test01.txt"
 #define WEATHER_TEST_02_FILE ""
 #define WEATHER_TEST_03_FILE ""
 
@@ -36,6 +36,11 @@ void motor_write(int fd_servo, char data);
 /* 최초 구동 시 장치의 작동을 테스트하는 함수 */
 void device_init(int fd_led, int fd_servo);
 
+/* 날씨 정보 얻어오기 */
+int get_weather(int* weather, int* is_rain, int* dust);
+
+/* 읽어온 정보를 토대로 led와 모터 설정 */
+void set_weather(int fd_led, int fd_servo, int weather, int is_rain, int dust);
 
 int main(int argc, char **argv){
     /* 장치 파일 디스크럽터 */
@@ -52,16 +57,16 @@ int main(int argc, char **argv){
     /* 날씨 정보 열어서 정보 가져오기 */
     int weather = 0;          //날씨 : (0, 맑음) (1, 흐림) (2, 눈/비)
     int is_rain = 0;            //비소식 : (0, 없음) (1, 있음)
-    int dust = 0;               //미세먼지 농도 : 받아서 if문으로 좋음 보통 나쁨 구분할 것
-
-    /* 날씨 정보 파일 열기 */
-    //fd_weather_info = open_weather_file();
+    int dust = 0;               //미세먼지 농도 : (0 좋음 : 0~15 / 1 보통 : 16~35 / 2 나쁨 : 36~)
 
     /* 장치 정상작동 확인하기 */   
     device_init(fd_led, fd_servo_motor);
 
+    /* 날씨 정보 파일 열기 */
+    get_weather(&weather, &is_rain, &dust);
 
-
+    /* 얻어온대로 장치 설정하기 */
+    set_weather(fd_led, fd_servo_motor, weather, is_rain, dust);
 
     /* 종료하기 */
     //close(fd_led);
@@ -161,4 +166,87 @@ void device_init(int fd_led, int fd_servo) {
                 sleep(0.1);
         }
         /* 작동 확인 완료 */
+}
+
+/* 날씨 받아오는 프로그램*/
+void get_weather(int* weather, int* is_rain, int* dust) {
+        int fd = open(WEATHER_INFO_FILE, O_RDRW);
+
+        if (fd < 0) {
+                fprintf(stderr, "날씨 파일을 여는데 실패했습니다!\n");
+                return -1;
+        }
+        
+        char buffer[5] = { '\0', };
+        ssize_t result = read(fd, buffer, sizeof(char) * 5);
+        if (result) {
+                fprintf(stderr, "파일 읽기 실패\n");
+                return -1;
+        }
+        
+        weather* = atoi(buffer[0]);
+        is_rain* = atoi(buffer[2]);
+        dust* = atoi(buffer[4]);
+
+        return 0;
+}
+
+/* 읽어온 정보를 토대로 led와 모터 설정 */
+void set_weather(int fd_led, int fd_servo, int weather, int is_rain, int dust) {
+        char led_info[4] = { '\0', };
+
+        switch (is_rain) {
+        case 0:
+                led_info[4] = on;
+                break;
+        case 1:
+                led_info[4] = off;
+                break;
+        default:
+                led_info[4] = off;
+                break;
+        }
+        switch (dust) {
+        case 0:
+                led_info[0] = on;
+                led_info[1] = off;
+                led_info[2] = off;
+                break;
+        case 1:
+                led_info[0] = off;
+                led_info[1] = on;
+                led_info[2] = off;
+                break;
+        case 2:
+                led_info[0] = off;
+                led_info[1] = off;
+                led_info[2] = on;
+                break;
+        default:
+                led_info[0] = off;
+                led_info[1] = off;
+                led_info[2] = off;
+                break;
+        }
+        led_setting(fd_led, led_info[0], led_info[1], led_info[2], led_info[3]);
+
+        /* 서보모터 설정 시작 */
+        char motor = '0';
+
+        switch (weather) {
+        case 0:
+                motor = 5;
+                break;
+        case 1:
+                motor = 3;
+                break;
+        case 2:
+                motor = 1;
+                break;
+        default:
+                motor = 0;
+                break;
+        }
+
+        motor_write(fd_servo, motor);
 }
