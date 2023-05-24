@@ -169,8 +169,8 @@ void device_init(int fd_led, int fd_servo) {
 }
 
 /* 날씨 받아오는 프로그램*/
-void get_weather(int* weather, int* is_rain, int* dust) {
-        int fd = open(WEATHER_INFO_FILE, O_RDRW);
+int get_weather(int* weather, int* is_rain, int* dust) {
+        int fd = open(WEATHER_INFO_FILE, O_RDWR);
 
         if (fd < 0) {
                 fprintf(stderr, "날씨 파일을 여는데 실패했습니다!\n");
@@ -184,9 +184,9 @@ void get_weather(int* weather, int* is_rain, int* dust) {
                 return -1;
         }
         
-        weather* = atoi(buffer[0]);
-        is_rain* = atoi(buffer[2]);
-        dust* = atoi(buffer[4]);
+        *weather = atoi(buffer[0]);
+        *is_rain = atoi(buffer[2]);
+        *dust = atoi(buffer[4]);
 
         return 0;
 }
