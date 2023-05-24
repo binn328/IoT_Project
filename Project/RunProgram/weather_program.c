@@ -63,13 +63,17 @@ int main(int argc, char **argv){
     device_init(fd_led, fd_servo_motor);
 
     /* 날씨 정보 파일 열기 */
-    get_weather(&weather, &is_rain, &dust);
+    int result = get_weather(&weather, &is_rain, &dust);
+    if (result) {
+            printf("날씨 정보 열기 실패\n");
+            return -1;
+    }
 
     /* 얻어온대로 장치 설정하기 */
     set_weather(fd_led, fd_servo_motor, weather, is_rain, dust);
 
     /* 종료하기 */
-    //close(fd_led);
+    close(fd_led);
     close(fd_servo_motor);
     return 0;
 }
@@ -170,7 +174,7 @@ void device_init(int fd_led, int fd_servo) {
 
 /* 날씨 받아오는 프로그램*/
 int get_weather(int* weather, int* is_rain, int* dust) {
-        int fd = open(WEATHER_INFO_FILE, O_RDWR);
+        int fd = open(WEATHER_TEST_01_FILE, O_RDWR);
 
         if (fd < 0) {
                 fprintf(stderr, "날씨 파일을 여는데 실패했습니다!\n");
@@ -183,10 +187,10 @@ int get_weather(int* weather, int* is_rain, int* dust) {
                 fprintf(stderr, "파일 읽기 실패\n");
                 return -1;
         }
-        
-        *weather = atoi(buffer[0]);
-        *is_rain = atoi(buffer[2]);
-        *dust = atoi(buffer[4]);
+        close(fd);
+        *weather = (int(buffer[0] - '0');
+        *is_rain = (int(buffer[2] - '0');
+        *dust = (int(buffer[4] - '0');
 
         return 0;
 }
@@ -197,13 +201,13 @@ void set_weather(int fd_led, int fd_servo, int weather, int is_rain, int dust) {
 
         switch (is_rain) {
         case 0:
-                led_info[4] = on;
+                led_info[3] = on;
                 break;
         case 1:
-                led_info[4] = off;
+                led_info[3] = off;
                 break;
         default:
-                led_info[4] = off;
+                led_info[3] = off;
                 break;
         }
         switch (dust) {
