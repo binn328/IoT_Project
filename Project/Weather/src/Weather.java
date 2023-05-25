@@ -1,16 +1,4 @@
 
-/*import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;*/
 
 import org.json.simple.*;
 import org.json.simple.parser.*;
@@ -21,19 +9,37 @@ import java.time.*;
 import java.time.format.*;
 import java.util.*;
 
+
+
+
 public class Weather{
+	
 	
    public static void main(String[] args) throws IOException, ParseException {
      
-	   getWeatherInfo();
-    
-       getDustInfo();
+	  File file = new File("./java_api.txt");
+	  if (!file.exists()) {
+		  file.createNewFile();
+		  }
 
-    }
+		 try (FileOutputStream fos = new FileOutputStream(file);
+	             PrintWriter writer = new PrintWriter(fos)) {
+	             
+	            getWeatherInfo(writer);
+	            getDustInfo(writer);
+	            
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+	    }
+       
+    
    
    
-   public static void getWeatherInfo() throws IOException, ParseException{
-      String apiUrl = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst";
+   public static void getWeatherInfo(PrintWriter writer) throws IOException, ParseException{
+	   
+	   
+	   String apiUrl = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst";
       
       String serviceKey = "fWRe92lUenF956iBOQ5mghAic9lMcAQ5wNdWfT6hb4aaBD6XmT6Lr9gc9%2FKJI3FfaL37G8IrPkwUgEZbNtloSA%3D%3D";
       String nx = "92";
@@ -161,22 +167,22 @@ public class Weather{
         	            }
 
         	    		if(strHour.equals(fcstTime.toString().substring(0, 2))) {        	                
-        	            
-        	    			//System.out.print("\t" + "category : " + category);
-        	                //System.out.print(", fcst_Value : " + fcstValue);
-        	            
-        	                //System.out.print(", fcstDate : " + fcstDate);
-        	                //System.out.println(", fcstTime : " + fcstTime);
         	                
-        	    		if(category.equals("SKY") && fcstValue.equals("1")) {
-                            System.out.print("SUNNY");
-                         }else if(category.equals("SKY") 
-                               && (fcstValue.equals("3") || fcstValue.equals("4"))){
-                            System.out.print("CLOUDY");
-                         }
-                     }
+        	    			if(category.equals("SKY") && fcstValue.equals("1")) {
+        	    				//sunny
+        	    				writer.write("0 ");
+        	    			}else if(category.equals("SKY") 
+        	    					&& (fcstValue.equals("3") || fcstValue.equals("4"))){
+        	    				 //cloudy
+        	    				writer.write("1 ");
+        	    			}
+        	    			else if(category.equals("PTY") && !fcstValue.equals("0")) {
+        	    				//rain
+        	    				writer.write("2 ");
+        	    			}
+        	    		}
         	    		
-        	    }
+        	    	}
         	    
         	    if (category.equals("PTY") && !fcstValue.equals("0")) {
         	    	hasRain = true; //PTY:강수형태  0 = 없음:비 안옴 1= 비 2 = 비/눈 3 =눈 4= 소나기
@@ -186,71 +192,22 @@ public class Weather{
         	
 
         if (hasRain) {
-        	System.out.print("\t YES");	
+        	
+        	writer.write("1 ");//비옴
         }
         
         else {
-        	System.out.print("\t NO");
+        	
+        	writer.write("0 ");//비안옴
         }
    }
 
-            
-          
-         /* for(int i = 0 ; i < parse_item.size(); i++) {  //현재 api시간 기준으로 전체 목록 나오는거 
-             weather = (JSONObject) parse_item.get(i);
-             Object fcstValue = weather.get("fcstValue");
-             Object fcstDate = weather.get("fcstDate");
-             Object fcstTime = weather.get("fcstTime");
-             
-             if(fcstValue != null && fcstDate != null && fcstTime != null) {
-
-                category = (String)weather.get("category"); 
-             // 출력
-                if(category!=null && (category.startsWith("TMP") ||category.startsWith("POP")
-                      ||category.startsWith("SKY")|| category.startsWith("PTY"))) {
-                   if(!day.equals(fcstDate.toString())) {
-                      day=fcstDate.toString();
-                   }
-                   if(!time.equals(fcstTime.toString())) {
-                      time=fcstTime.toString();
-                      System.out.println(day+"  "+time);
-                   }
                
-                      System.out.print("\tcategory : "+ category);
-                      System.out.print(", fcst_Value : "+ fcstValue);
-                      System.out.print(", fcstDate : "+ fcstDate);
-                      System.out.println(", fcstTime : "+ fcstTime);
-                      
-                   
-                 if (category.equals("PTY") && !fcstValue.equals("0")) {
-                           hasRain = true; //PTY:강수형태  0 = 없음:비 안옴 1= 비 2 = 비/눈 3 =눈 4= 소나기
-                       }
-                      
-                      
-                }
-   
-
-             
-                   
-             }
-          }
-          
-          if (hasRain) {
-              System.out.println("\n\t비가 온다\n");
-          } else {
-              System.out.println("\n\t비 안옴\n");
-          }
-          
-          
-     }
-*/
-          
-          
             	  
            	  
         	    
         
- static void getDustInfo() throws IOException, ParseException{
+ static void getDustInfo(PrintWriter writer) throws IOException, ParseException{
       String serviceKey = "fWRe92lUenF956iBOQ5mghAic9lMcAQ5wNdWfT6hb4aaBD6XmT6Lr9gc9/KJI3FfaL37G8IrPkwUgEZbNtloSA==";
         
         StringBuilder urlBuilder = new StringBuilder("https://apis.data.go.kr/B552584/ArpltnStatsSvc/getCtprvnMesureSidoLIst"); /*URL*/
@@ -268,7 +225,6 @@ public class Weather{
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Content-type", "application/json");
 
-           // System.out.println("Response code: " + conn.getResponseCode());//200뜸 = 문제없음
             
             BufferedReader rd;
             if(conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) {
@@ -308,15 +264,18 @@ public class Weather{
                    String dataTime = (String) itemObj.get("dataTime");
                    String pm10Value = (String) itemObj.get("pm10Value");
 
-                   //System.out.println(dataTime);
+                   
                    int pm10ValueInt = Integer.parseInt(pm10Value);
 
                    if(pm10ValueInt >= 0 && pm10ValueInt <= 30) {
-                       System.out.print("\t" +pm10Value );
+                       //좋음
+                	   writer.write("0 ");
                    } else if(pm10ValueInt >= 31 && pm10ValueInt <= 80) {
-                       System.out.print("\t"+pm10Value );
+                       //보통
+                	   writer.write("1 ");
                    } else {
-                       System.out.print("\t"+pm10Value );
+                        //나쁨
+                	   writer.write("2 ");
                    }
               }
    
