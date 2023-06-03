@@ -1,32 +1,11 @@
 # IoT_Project
 IoT와 임베디드 프로젝트 레포입니다.
 
-필요한 폴더에서 터미널을 열고 
+- Documents : 발표자료와 보고서 등 문서 자료들이 저장된 디렉터리
 
-git clone https://github.com/binn328/IoT_Project.git 
-
-를 입력하시면 컴퓨터에 복제됩니다.
-
-이후 변경사항 업로드 시 
-
-해당 폴더에서 git add <업로드할 파일 이름>
-
-(만약 모든 파일을 선택하고 싶다면 " git add * " 하시면 됩니다.)
-
-이후 
-
-git commit -m "메시지"
-
-git push origin main
-
-하시면 깃허브에 업로드 됩니다.
-
-귀찮으시면 autoPush.bat 파일 누르면 자동으로 실행됩니다.
-
-autoPush.bat 파일을 메모장으로 열어서 "메시지"부분을 바꾸면 좋습니다.
-
-ex) "이정빈 2023-04-11 업로드" 
-
-autoPull.bat 은 저장소에서 파일을 가져오는 명령어입니다.
-
-업데이트로 이해하시면 편합니다.
+- Project : 프로젝트의 소스코드가 저장된 디렉터리
+ -> LED_Driver : LED 드라이버 디렉터리
+ -> Release : 하드웨어의 동작에 사용할 수 있는 디렉터리
+ -> RunProgram : 동작 프로그램 디렉터리
+ -> Servo_Motor_Driver : 서보모터 드라이버 디렉터리
+ -> Weather : api 요청 java 프로그램 디렉터리
